@@ -37,7 +37,8 @@ $data = [
 
 $content = (new Client())->get($url_site)->getBody()->getContents();
 
-$doc = @(new DOMDocument())->loadHTML($content);
+$doc = new DOMDocument();
+@$doc->loadHTML($content);
 $xpath = new DOMXPath($doc);
 $domNodeList = $xpath->evaluate('//*[@id="tool-altas-e-baixas-js-extra"]');
 
