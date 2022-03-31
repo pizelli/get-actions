@@ -3,6 +3,7 @@ require_once "vendor/autoload.php";
 
 use GuzzleHttp\Client;
 
+$url_site = 'https://www.infomoney.com.br/ferramentas/altas-e-baixas/?type=acoes/';
 $url = 'https://www.infomoney.com.br/wp-admin/admin-ajax.php';
 
 $headers = [
@@ -32,6 +33,20 @@ $data = [
     'altas_e_baixas_table_nonce' => '8e201fa7fb',
     'stock' => 2
 ];
+
+
+$content = (new Client())->get($url_site)->getBody()->getContents();
+
+$doc = @(new DOMDocument())->loadHTML($content);
+$xpath = new DOMXPath($doc);
+$domNodeList = $xpath->evaluate('//*[@id="tool-altas-e-baixas-js-extra"]');
+
+$text =  $domNodeList->item(0)->nodeValue;
+preg_match('/{"(.*?)"}/', $text, $output);
+$json = json_decode('{"' . $output[1] . '"}', true);
+
+/* set new code */
+$data['altas_e_baixas_table_nonce'] = $json['altas_e_baixas_table_nonce'];
 
 $client = new Client(['headers' => $headers]);
 $response = $client->post($url, ['form_params' => $data]);
